@@ -1,0 +1,27 @@
+# Entorno Virtual Python
+venv/
+env/
+ENV/
+
+# Byte-compiled / Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Sandbox efímera local
+/tmp/harness_*
+/tmp/harness_sandbox/
+/tmp/harness_multiagent_sandbox/
+
+# Artefactos temporales creados durante ejecuciones
+math_utils.py
+test_runner.py
+app.py
+solution.py
+test_solution.py
+test_app.py
+
+# Archivos de SO/IDE
+.DS_Store
+.vscode/
+.idea/
