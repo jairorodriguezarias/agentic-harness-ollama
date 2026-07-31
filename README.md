@@ -95,6 +95,12 @@ python3 5_multiagent_harness.py
 # Hito 6: Metric Harness
 python3 6_metric_harness.py
 
-# Harness Delegate Script Execution
+# Hito 7: Evaluador Semántico (LLM-as-a-Judge)
+python3 7_judge_harness.py
+
+# Hito 8: Generación de Reporte y Quality Gate de Auditoría
+python3 8_report_harness.py
+
+# Simulador de Ejecución para Harness Delegate
 ./run_harness_agent.sh
 ```
