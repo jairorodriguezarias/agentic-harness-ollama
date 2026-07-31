@@ -1,0 +1,14 @@
+[
+  {
+    "id": "rule_typing",
+    "content": "REGLA_ESTILO_01: Todo código Python debe incluir Type Hints explícitos en los parámetros y retorno."
+  },
+  {
+    "id": "rule_exceptions",
+    "content": "REGLA_ESTILO_02: Valida siempre tipos de entrada y lanza explicítamente excepciones como ValueError o TypeError."
+  },
+  {
+    "id": "rule_formatting",
+    "content": "REGLA_ESTILO_03: Incluye docstrings explicativos para cada función creada."
+  }
+]

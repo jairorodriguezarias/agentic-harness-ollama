@@ -9,7 +9,7 @@ def evaluate_opa_policy(report_file: str) -> dict:
     Simula el motor de validación de Open Policy Agent (OPA / Rego)[cite: 353, 920].
     Somete el artefacto eval_report.json a las políticas estrictas de gobernanza[cite: 353, 921].
     """
-    print(f"🔒 [OPA Policy Engine] Cargando informe de auditoría '{report_file}'...")
+    print(f" [OPA Policy Engine] Cargando informe de auditoría '{report_file}'...")
     
     if not os.path.exists(report_file):
         return {
