@@ -1,0 +1,181 @@
+PROMPT: Implementa una función 'buscar_subcadena_kmp(texto, patron)' que use el algoritmo Knuth-Morris-Pratt.
+
+TRAZA DE RAZONAMIENTO:
+1. Análisis y Suposiciones del Problema:
+
+El objetivo es implementar el algoritmo Knuth-Morris-Pratt (KMP) para la búsqueda de subcadenas. Este algoritmo mejora la complejidad temporal sobre una búsqueda naive, especialmente cuando hay repeticiones en el patrón, al evitar volver a examinar caracteres ya comparados en el texto ($T$).
+
+**Suposiciones:**
+1. El `texto` ($T$) y el `patron` ($P$) son cadenas de caracteres válidas.
+2. Si el patrón es más largo que el texto, no puede haber coincidencias.
+3. La función debe retornar una lista de todos los índices iniciales en $T$ donde se encuentra $P$.
+
+**Componentes del Algoritmo KMP:**
+El algoritmo se divide en dos fases cruciales:
+a) **Construcción del Array LPS (Longest Proper Prefix which is also a Suffix):** Se construye un array auxiliar para el patrón, que indica, si ocurre una desalineación parcial, cuántos caracteres ya coincidentes de la cola del patrón pueden servir como prefijo. Esto es lo que permite el "salto" eficiente.
+b) **Búsqueda:** Se itera sobre el texto y se compara con el patrón utilizando los valores precalculados en LPS para manejar eficientemente los fallos (mismatches).
+
+2. Casos Borde a Manejar:
+
+*   **Patrón vacío (`patron == ""`):** Una coincidencia puede considerarse un éxito, pero en la práctica de búsqueda, esto es ambiguo. Si el patrón está vacío, se asumirá que no hay búsquedas válidas o devolveremos una lista vacía (el manejo más seguro).
+*   **Texto vacío (`texto == ""`):** No puede haber coincidencias; la función debe retornar `[]`.
+*   **Patrón mayor que Texto:** El algoritmo debería manejarse de forma natural, ya que el bucle principal de búsqueda terminará antes de encontrar una coincidencia.
+*   **Sin Coincidencias:** El resultado esperado es una lista vacía (`[]`).
+*   **Coincidencia Completa (Todo el texto = Patrón):** Debe ser detectada correctamente en el último índice posible.
+
+3. Análisis de Complejidad:
+
+*   **Complejidad Temporal ($O(N+M)$):**
+    *   Donde $N$ es la longitud del `texto` y $M$ es la longitud del `patron`.
+    *   La fase de construcción del LPS (preprocesamiento) recorre el patrón una sola vez, lo que toma tiempo lineal: $O(M)$.
+    *   La fase de búsqueda KMP también solo avanza sobre el texto y el patrón, con los movimientos de *fallback* garantizando que no hay retrocesos neta en la complejidad total. Esto resulta en un tiempo lineal: $O(N)$.
+    *   Tiempo Total: $O(M) + O(N) = O(N+M)$. Este es el mejor caso posible para esta tarea.
+*   **Complejidad Espacial ($O(M)$):**
+    *   Se requiere un arreglo de tamaño $M$ (el array LPS). El espacio adicional requerido crece linealmente con la longitud del patrón.
+
+La implementación seguirá este flujo: función principal $\rightarrow$ llamada a `compute_lps` $\rightarrow$ ejecución de la búsqueda KMP en el texto usando los resultados del LPS.
+
+CÓDIGO RESULTANTE:
+import typing
+
+def compute_lps(patron: str) -> typing.List[int]:
+    """
+    Calcula el arreglo Longest Proper Prefix which is also a Suffix (LPS) 
+    para un patrón dado. Este array es fundamental para KMP.
+    
+    lps[i] almacena la longitud del prefijo más largo de patron[0...i] que también
+    es sufijo de patron[0...i].
+
+    Complejidad: O(M) espacio y tiempo (donde M es la longitud del patrón).
+    """
+    M = len(patron)
+    lps = [0] * M
+    length = 0  # Longitud del prefijo/sufijo que estamos considerando
+    i = 1
+
+    while i < M:
+        if patron[i] == patron[length]:
+            length += 1
+            lps[i] = length
+            i += 1
+        else:
+            # Caso de desajuste: Si longitud > 0, usamos el LPS anterior para retroceder.
+            if length != 0:
+                length = lps[length - 1]
+                # Nota: No incrementamos 'i' aquí; volvemos a comparar en la misma posición i
+            else:
+                # Si longitud == 0, no hay prefijo/sufijo que coincida.
+                lps[i] = 0
+                i += 1
+    return lps
+
+def buscar_subcadena_kmp(texto: str, patron: str) -> typing.List[int]:
+    """
+    Implementa el algoritmo Knuth-Morris-Pratt (KMP) para encontrar todas las 
+    ocurrencias de un patrón en un texto.
+
+    Args:
+        texto: La cadena de texto grande (T).
+        patron: La subcadena a buscar (P).
+
+    Returns:
+        Una lista de enteros que representan los índices iniciales donde se encontró el patrón.
+    """
+    N = len(texto)
+    M = len(patron)
+    resultados: typing.List[int] = []
+
+    # Manejo de casos borde críticos
+    if M == 0:
+        # Un patron vacío coincide en cualquier lugar antes de un carácter, pero lo tratamos como no encontrable
+        return []
+    if N < M:
+        return []
+        
+    if N == 0:
+        return []
+
+    # Fase 1: Preprocesamiento
+    lps = compute_lps(patron)
+
+    # Fase 2: Búsqueda KMP
+    i, j = 0, 0  # i es el índice del texto; j es el índice del patrón
+    
+    while i < N:
+        if patron[j] == texto[i]:
+            i += 1
+            j += 1
+
+        if j == M:
+            # ¡Coincidencia encontrada! El patrón termina en i-1 y comienza en (i - M).
+            indice_inicio = i - M
+            resultados.append(indice_inicio)
+
+            # Para buscar más ocurrencias, debemos "deslizar" el patrón 
+            # manteniendo la parte coincidida usando el LPS para saber dónde empezar a comparar.
+            j = lps[j - 1]
+
+        elif i < N and patron[j] != texto[i]:
+            # Desajuste (Mismatch)
+            if j != 0:
+                # Retrocedemos 'j' utilizando el arreglo LPS, pero mantenemos 'i' en su posición.
+                j = lps[j - 1]
+            else:
+                # Si j == 0 y hay desajuste, simplemente avanzamos por el texto.
+                i += 1
+    
+    return resultados
+
+if __name__ == '__main__':
+    # Caso 1: Coincidencia simple
+    print("--- Test 1: Simple ---")
+    texto1 = "ABABDABACDABABCABAB"
+    patron1 = "ABABCABAB"
+    indices1 = buscar_subcadena_kmp(texto1, patron1)
+    print(f"Texto: '{texto1}', Patrón: '{patron1}'")
+    print(f"Índices encontrados: {indices1} (Esperado: [10])\n")
+
+    # Caso 2: Múltiples coincidencias superpuestas
+    print("--- Test 2: Superposición ---")
+    texto2 = "AAAAA"
+    patron2 = "AA"
+    indices2 = buscar_subcadena_kmp(texto2, patron2)
+    print(f"Texto: '{texto2}', Patrón: '{patron2}'")
+    print(f"Índices encontrados: {indices2} (Esperado: [0, 1, 2, 3])\n")
+
+    # Caso 3: Sin coincidencias
+    print("--- Test 3: No encontrado ---")
+    texto3 = "ABCDEFG"
+    patron3 = "XYZ"
+    indices3 = buscar_subcadena_kmp(texto3, patron3)
+    print(f"Texto: '{texto3}', Patrón: '{patron3}'")
+    print(f"Índices encontrados: {indices3} (Esperado: [])\n")
+
+    # Caso 4: Coincidencia al inicio y fin
+    print("--- Test 4: Inicio y Fin ---")
+    texto4 = "ABCXYZABC"
+    patron4 = "ABC"
+    indices4 = buscar_subcadena_kmp(texto4, patron4)
+    print(f"Texto: '{texto4}', Patrón: '{patron4}'")
+    print(f"Índices encontrados: {indices4} (Esperado: [0, 6])\n")
+
+    # Caso 5: Casos Borde
+    print("--- Test 5: Casos Borde ---")
+    texto5_a = "ABC"
+    patron5_a = ""
+    indices5_a = buscar_subcadena_kmp(texto5_a, patron5_a)
+    print(f"Texto: '{texto5_a}', Patrón: '{patron5_a}' (Vacío)")
+    print(f"Índices encontrados: {indices5_a} (Esperado: [])\n")
+
+    texto5_b = ""
+    patron5_b = "A"
+    indices5_b = buscar_subcadena_kmp(texto5_b, patron5_b)
+    print(f"Texto: '{texto5_b}' (Vacío), Patrón: '{patron5_b}'")
+    print(f"Índices encontrados: {indices5_b} (Esperado: [])\n")
+
+    texto5_c = "A"
+    patron5_c = "ABC"
+    indices5_c = buscar_subcadena_kmp(texto5_c, patron5_c)
+    print(f"Texto: '{texto5_c}', Patrón: '{patron5_c}' (Patrón > Texto)")
+    print(f"Índices encontrados: {indices5_c} (Esperado: [])\n")
+</if>

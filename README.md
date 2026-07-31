@@ -43,6 +43,17 @@ Insertar un Juez Evaluador en Python que actuará como Quality Gate
                                Score >= 80            				  Score < 80
                              (Aprobado CI/CD)     			(Fallo / Auto-Corrección)
 
+### Hito 8: Policy
+Crear un archivo REGO, con las politicas
+
+
+
+### Hito 9:
+
+
+### Hito 10: 
+
+
 ---
 
 ## 🚀 Guía de Instalación y Uso
@@ -54,6 +65,7 @@ Insertar un Juez Evaluador en Python que actuará como Quality Gate
 ```bash
 # Servir e instalar el modelo
 ollama pull gemma4
+ollama pull qwen2.5-coder
 ```
 
 ### Configuración del Entorno
@@ -77,6 +89,9 @@ chmod +x run_harness_agent.sh
 ### Ejecución de los Agentes
 
 ```bash
+
+###Parte 1: Basicos
+
 # Hito 1: Tool Calling
 python3 1_agent_harness.py
 
@@ -92,6 +107,8 @@ python3 4_sandbox_harness.py
 # Hito 5: Multi-Agent Swarm
 python3 5_multiagent_harness.py
 
+###Parte 2: Metricas, evaluación y reportes
+
 # Hito 6: Metric Harness
 python3 6_metric_harness.py
 
@@ -100,6 +117,17 @@ python3 7_judge_harness.py
 
 # Hito 8: Generación de Reporte y Quality Gate de Auditoría
 python3 8_report_harness.py
+
+###Parte 3: Gobernanza, Multi-Modelo y Trazabilidad Avanzada
+
+# Hito 9: Policy-as-Code Engine (`9_opa_harness.py` + `policy.rego`)**
+  Evaluación determinista de políticas corporativas mediante reglas Rego (OPA). Bloquea despliegues si la latencia o la calidad semántica no cumplen los SLAs exigidos.
+
+# Hito 10: Multi-Model Orchestration (`10_multimodel_harness.py`)**
+  Orquestación local en caliente combinando modelos especializados (Coder vs. Auditor) sin sobrecargar la RAM.
+
+# Hito 11: Reasoning Trace Auditor (`11_reasoning_trace_harness.py`)**
+  Extracción e inspección de las trazas de pensamiento internas (`<think>`) del modelo para auditoría de cumplimiento y depuración de decisiones de diseño (`reasoning_audit.log`).
 
 # Simulador de Ejecución para Harness Delegate
 ./run_harness_agent.sh
